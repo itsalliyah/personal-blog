@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ site_owner.display_name if site_owner else 'My Journal' }}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,16..30,400;0,16..30,500;1,16..30,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+  <header class="site-header">
+    <a class="wordmark" href="{{ url_for('index') }}">{{ site_owner.display_name if site_owner else 'My Journal' }}</a>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="{{ 'is-active' if request.endpoint == 'index' }}">Journal</a>
+      <a href="{{ url_for('profile') }}" class="{{ 'is-active' if request.endpoint == 'profile' }}">Profile</a>
+      {% if logged_in %}
+        <a href="{{ url_for('dashboard') }}" class="{{ 'is-active' if request.endpoint in ['dashboard','new_post','edit_post','edit_profile'] }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Log out</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Log in</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">
+        {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="page-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span>&copy; {{ 2026 }} {{ site_owner.display_name if site_owner else '' }}</span>
+  </footer>
+</div>
+</body>
+</html>

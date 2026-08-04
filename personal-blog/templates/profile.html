@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Profile — {{ user.display_name }}{% endblock %}
+{% block content %}
+
+<div class="site-banner {{ 'has-image' if user.banner_url }}"
+     {% if user.banner_url %}style="background-image:url('{{ user.banner_url }}');"{% endif %}>
+</div>
+
+<div class="profile-header">
+  {% if user.avatar_url %}
+    <img class="profile-avatar" src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+  {% else %}
+    <div class="profile-avatar placeholder">{{ user.display_name[:1] }}</div>
+  {% endif %}
+
+  <div class="profile-header-text">
+    <h1 class="profile-name">{{ user.display_name }}</h1>
+    {% if logged_in %}
+      <a class="btn btn-secondary" href="{{ url_for('edit_profile') }}">Edit profile</a>
+    {% endif %}
+  </div>
+</div>
+
+<p class="profile-bio">{{ user.bio }}</p>
+
+{% endblock %}

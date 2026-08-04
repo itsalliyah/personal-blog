@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit post' if post else 'New post' }}{% endblock %}
+{% block content %}
+
+<h1 style="font-family:var(--font-display);font-size:1.6rem;">{{ 'Edit post' if post else 'New post' }}</h1>
+
+<form class="form-stack" method="post" style="margin-top:24px;">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required>
+  </div>
+  <div class="field">
+    <label for="content">Content (Markdown supported)</label>
+    <textarea id="content" name="content" rows="16" required>{{ post.content if post else '' }}</textarea>
+  </div>
+  <label class="checkbox-row">
+    <input type="checkbox" name="published" {% if not post or post.published %}checked{% endif %}>
+    Published (uncheck to save as a private draft)
+  </label>
+  <div class="form-row">
+    <button class="btn" type="submit">Save</button>
+    <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

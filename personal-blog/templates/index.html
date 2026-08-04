@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if site_owner and site_owner.banner_url %}
+<div class="site-hero" style="background-image:url('{{ site_owner.banner_url }}');">
+  <div class="site-hero-overlay">
+    <h1>{{ site_owner.display_name }}</h1>
+    {% if site_owner.bio %}<p>{{ site_owner.bio }}</p>{% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% if posts %}
+<ul class="post-list">
+  {% for post in posts %}
+  <li class="post-list-item">
+    <div class="meta-row">
+      <span class="postmark">{{ post.created_at[:10] }}</span>
+    </div>
+    <h2><a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a></h2>
+    <p class="post-excerpt">{{ post.content[:180] }}{% if post.content|length > 180 %}&hellip;{% endif %}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+  Nothing published yet.
+  {% if logged_in %}<br><a href="{{ url_for('new_post') }}">Write your first post &rarr;</a>{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

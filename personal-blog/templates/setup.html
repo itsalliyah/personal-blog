@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Set up your account{% endblock %}
+{% block content %}
+
+<div class="login-shell">
+  <h1>Create your account</h1>
+  <p style="color:var(--ink-soft);margin-top:-10px;font-size:0.95rem;">
+    This runs once. After this account is created, this page locks itself —
+    there's no way to create a second account.
+  </p>
+  <form class="form-stack" method="post">
+    <div class="field">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="new-password" required minlength="6">
+    </div>
+    {% if error %}<p class="error-msg">{{ error }}</p>{% endif %}
+    <button class="btn" type="submit">Create account</button>
+  </form>
+</div>
+
+{% endblock %}

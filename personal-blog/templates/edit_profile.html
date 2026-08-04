@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+
+<h1 style="font-family:var(--font-display);font-size:1.6rem;">Edit profile</h1>
+
+<form class="form-stack" method="post" enctype="multipart/form-data" style="margin-top:24px;">
+
+  <div class="field">
+    <label>Banner/header image</label>
+    {% if user.banner_url %}
+      <div class="banner-preview" style="background-image:url('{{ user.banner_url }}');"></div>
+      <label class="checkbox-row" style="margin-top:8px;">
+        <input type="checkbox" name="remove_banner"> Remove current banner image
+      </label>
+    {% endif %}
+    <input type="file" name="banner_file" accept="image/png,image/jpeg,image/gif,image/webp">
+  </div>
+
+  <div class="field">
+    <label>Avatar</label>
+    {% if user.avatar_url %}
+      <img class="avatar-preview" src="{{ user.avatar_url }}" alt="Current avatar">
+      <label class="checkbox-row" style="margin-top:8px;">
+        <input type="checkbox" name="remove_avatar"> Remove current avatar
+      </label>
+    {% endif %}
+    <input type="file" name="avatar_file" accept="image/png,image/jpeg,image/gif,image/webp">
+  </div>
+
+  <div class="field">
+    <label for="display_name">Display name</label>
+    <input type="text" id="display_name" name="display_name" value="{{ user.display_name }}" required>
+  </div>
+
+  <div class="field">
+    <label for="bio">Bio</label>
+    <textarea id="bio" name="bio" rows="6">{{ user.bio }}</textarea>
+  </div>
+
+  <div class="form-row">
+    <button class="btn" type="submit">Save</button>
+    <a class="btn btn-secondary" href="{{ url_for('profile') }}">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}
