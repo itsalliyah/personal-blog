@@ -19,7 +19,7 @@
     </div>
     <h2><a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a></h2>
     {% if post.category %}<a class="mini-pill" href="{{ url_for('by_category', name=post.category) }}">{{ post.category }}</a>{% endif %}
-    <p class="post-excerpt">{{ post.content[:180] }}{% if post.content|length > 180 %}&hellip;{% endif %}</p>
+    <p class="post-excerpt">{{ post.content|excerpt(180) }}</p>
   </li>
   {% endfor %}
 </ul>

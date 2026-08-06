@@ -114,6 +114,17 @@ init_db()
 
 
 # ---------- Helpers ----------
+def make_excerpt(text, length=200):
+    text = re.sub(r'!\[.*?\]\(.*?\)', '', text)          # remove ![alt](url) image syntax
+    text = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', text)  # [text](url) -> text
+    text = re.sub(r'[*_#>`]', '', text)                   # strip stray markdown symbols
+    text = text.strip()
+    if len(text) > length:
+        text = text[:length].rsplit(' ', 1)[0] + '…'
+    return text
+
+
+app.jinja_env.filters['excerpt'] = make_excerpt
 
 def slugify(title):
     slug = title.strip().lower()
