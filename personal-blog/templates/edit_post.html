@@ -10,6 +10,10 @@
     <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required>
   </div>
   <div class="field">
+    <label for="category">Category (optional)</label>
+    <input type="text" id="category" name="category" value="{{ post.category if post else '' }}" placeholder="e.g. Life, Travel, Recipes">
+  </div>
+  <div class="field">
     <label for="content">Content (Markdown supported)</label>
     <textarea id="content" name="content" rows="16" required>{{ post.content if post else '' }}</textarea>
   </div>

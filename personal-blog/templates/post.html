@@ -8,6 +8,7 @@
       {{ post.created_at[:10] }}{% if not post.published %} · draft{% endif %}
     </span>
     <h1>{{ post.title }}</h1>
+    {% if post.category %}<a class="mini-pill" href="{{ url_for('by_category', name=post.category) }}">{{ post.category }}</a>{% endif %}
   </div>
   <div class="post-body">
     {{ html_content | safe }}

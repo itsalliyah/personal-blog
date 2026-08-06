@@ -38,6 +38,11 @@
     <textarea id="bio" name="bio" rows="6">{{ user.bio }}</textarea>
   </div>
 
+  <div class="field">
+    <label for="contact_email">Contact email (shown on your Contact page)</label>
+    <input type="text" id="contact_email" name="contact_email" value="{{ user.contact_email }}" placeholder="you@example.com">
+  </div>
+
   <div class="form-row">
     <button class="btn" type="submit">Save</button>
     <a class="btn btn-secondary" href="{{ url_for('profile') }}">Cancel</a>

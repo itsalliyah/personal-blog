@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ category }} — Category{% endblock %}
+{% block content %}
+
+<h1 class="page-title">Category: {{ category }} 🎀</h1>
+<a class="back-link" href="{{ url_for('archive') }}">&larr; back to archive</a>
+
+{% if posts %}
+<ul class="post-list">
+  {% for post in posts %}
+  <li class="post-list-item">
+    <div class="meta-row">
+      <span class="postmark">{{ post.created_at[:10] }}</span>
+    </div>
+    <h2><a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a></h2>
+    <p class="post-excerpt">{{ post.content[:180] }}{% if post.content|length > 180 %}&hellip;{% endif %}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">No posts in this category yet.</div>
+{% endif %}
+
+{% endblock %}

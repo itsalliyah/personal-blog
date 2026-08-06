@@ -66,7 +66,8 @@ def init_db():
             display_name TEXT NOT NULL DEFAULT 'Your Name',
             bio TEXT NOT NULL DEFAULT 'Write something about yourself here.',
             avatar_url TEXT NOT NULL DEFAULT '',
-            banner_url TEXT NOT NULL DEFAULT ''
+            banner_url TEXT NOT NULL DEFAULT '',
+            contact_email TEXT NOT NULL DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS post (
@@ -74,6 +75,7 @@ def init_db():
             title TEXT NOT NULL,
             slug TEXT UNIQUE NOT NULL,
             content TEXT NOT NULL,
+            category TEXT NOT NULL DEFAULT '',
             published INTEGER NOT NULL DEFAULT 1,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
@@ -85,6 +87,14 @@ def init_db():
         db.execute("ALTER TABLE user ADD COLUMN banner_url TEXT NOT NULL DEFAULT ''")
     except sqlite3.OperationalError:
         pass  # column already exists
+    try:
+        db.execute("ALTER TABLE user ADD COLUMN contact_email TEXT NOT NULL DEFAULT ''")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        db.execute("ALTER TABLE post ADD COLUMN category TEXT NOT NULL DEFAULT ''")
+    except sqlite3.OperationalError:
+        pass
     # Migration: earlier versions of this project called it "cover_url" —
     # carry that value over so nobody loses their uploaded image.
     try:
@@ -174,6 +184,50 @@ def profile():
     return render_template("profile.html", user=user)
 
 
+@app.route("/contact")
+def contact():
+    db = get_db()
+    user = db.execute("SELECT * FROM user LIMIT 1").fetchone()
+    return render_template("contact.html", user=user)
+
+
+@app.route("/archive")
+def archive():
+    db = get_db()
+    posts = db.execute(
+        "SELECT * FROM post WHERE published = 1 ORDER BY created_at DESC"
+    ).fetchall()
+
+    groups = []  # [(label, [posts]), ...] grouped by Month Year
+    current_label = None
+    current_bucket = None
+    for post in posts:
+        dt = datetime.fromisoformat(post["created_at"])
+        label = dt.strftime("%B %Y")
+        if label != current_label:
+            current_label = label
+            current_bucket = []
+            groups.append((label, current_bucket))
+        current_bucket.append(post)
+
+    categories = db.execute(
+        "SELECT category, COUNT(*) as count FROM post "
+        "WHERE published = 1 AND category != '' GROUP BY category ORDER BY category"
+    ).fetchall()
+
+    return render_template("archive.html", groups=groups, categories=categories)
+
+
+@app.route("/category/<name>")
+def by_category(name):
+    db = get_db()
+    posts = db.execute(
+        "SELECT * FROM post WHERE published = 1 AND category = ? ORDER BY created_at DESC",
+        (name,),
+    ).fetchall()
+    return render_template("category.html", posts=posts, category=name)
+
+
 # ---------- Auth ----------
 
 @app.route("/setup", methods=["GET", "POST"])
@@ -251,6 +305,7 @@ def new_post():
         db = get_db()
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+        category = request.form.get("category", "").strip()
         published = 1 if request.form.get("published") else 0
         if not title or not content:
             flash("Title and content are required.")
@@ -258,9 +313,9 @@ def new_post():
         slug = unique_slug(db, title)
         now = datetime.utcnow().isoformat()
         db.execute(
-            "INSERT INTO post (title, slug, content, published, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (title, slug, content, published, now, now),
+            "INSERT INTO post (title, slug, content, category, published, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (title, slug, content, category, published, now, now),
         )
         db.commit()
         flash("Post created.")
@@ -278,6 +333,7 @@ def edit_post(post_id):
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+        category = request.form.get("category", "").strip()
         published = 1 if request.form.get("published") else 0
         if not title or not content:
             flash("Title and content are required.")
@@ -285,8 +341,8 @@ def edit_post(post_id):
         slug = unique_slug(db, title, ignore_id=post_id)
         now = datetime.utcnow().isoformat()
         db.execute(
-            "UPDATE post SET title=?, slug=?, content=?, published=?, updated_at=? WHERE id=?",
-            (title, slug, content, published, now, post_id),
+            "UPDATE post SET title=?, slug=?, content=?, category=?, published=?, updated_at=? WHERE id=?",
+            (title, slug, content, category, published, now, post_id),
         )
         db.commit()
         flash("Post updated.")
@@ -312,6 +368,7 @@ def edit_profile():
     if request.method == "POST":
         display_name = request.form.get("display_name", "").strip() or "Your Name"
         bio = request.form.get("bio", "").strip()
+        contact_email = request.form.get("contact_email", "").strip()
 
         # Start with whatever is already saved, then overwrite only if the
         # person uploaded a new photo this time.
@@ -332,8 +389,8 @@ def edit_profile():
             banner_url = ""
 
         db.execute(
-            "UPDATE user SET display_name=?, bio=?, avatar_url=?, banner_url=? WHERE id=?",
-            (display_name, bio, avatar_url, banner_url, user["id"]),
+            "UPDATE user SET display_name=?, bio=?, avatar_url=?, banner_url=?, contact_email=? WHERE id=?",
+            (display_name, bio, avatar_url, banner_url, contact_email, user["id"]),
         )
         db.commit()
         flash("Profile updated.")

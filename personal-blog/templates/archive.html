@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Archive{% endblock %}
+{% block content %}
+
+<h1 class="page-title">The Archive 🗂️💗</h1>
+
+{% if categories %}
+<div class="category-pills">
+  {% for cat in categories %}
+    <a class="category-pill" href="{{ url_for('by_category', name=cat.category) }}">
+      {{ cat.category }} <span>{{ cat.count }}</span>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if groups %}
+  {% for label, posts in groups %}
+  <section class="archive-group">
+    <h2 class="archive-month">{{ label }}</h2>
+    <ul class="archive-list">
+      {% for post in posts %}
+      <li>
+        <a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a>
+        {% if post.category %}<span class="mini-pill">{{ post.category }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+{% else %}
+<div class="empty-state">Nothing published yet — the archive will fill up as you post!</div>
+{% endif %}
+
+{% endblock %}
