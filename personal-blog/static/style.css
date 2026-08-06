@@ -410,6 +410,25 @@ a { color: inherit; }
 .field textarea { resize: vertical; font-family: var(--font-body); font-size: 0.98rem; }
 .field input:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
 
+/* Post editor image-upload toolbar */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.editor-upload-btn {
+  font-size: 0.78rem;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.upload-status {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--accent-2);
+}
+
 .checkbox-row { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 600; font-size: 0.88rem; color: var(--ink-soft); }
 
 .btn {

@@ -298,6 +298,24 @@ def dashboard():
     return render_template("dashboard.html", posts=posts)
 
 
+@app.route("/dashboard/upload-image", methods=["POST"])
+@login_required
+def upload_image():
+    """Used by the post editor's 'Insert image' button — uploads a picture
+    and returns its URL as JSON so it can be inserted into the Markdown
+    content without leaving the page."""
+    file_storage = request.files.get("image")
+    if not file_storage or file_storage.filename == "":
+        return {"error": "No file selected."}, 400
+    if not allowed_file(file_storage.filename):
+        return {"error": "Unsupported file type — use png, jpg, gif, or webp."}, 400
+    ext = file_storage.filename.rsplit(".", 1)[1].lower()
+    unique_name = f"{uuid.uuid4().hex}.{ext}"
+    file_storage.save(os.path.join(UPLOAD_FOLDER, unique_name))
+    url = url_for("static", filename=f"uploads/{unique_name}")
+    return {"url": url}
+
+
 @app.route("/dashboard/new", methods=["GET", "POST"])
 @login_required
 def new_post():

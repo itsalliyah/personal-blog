@@ -15,6 +15,13 @@
   </div>
   <div class="field">
     <label for="content">Content (Markdown supported)</label>
+    <div class="editor-toolbar">
+      <label for="image_upload" class="btn btn-secondary editor-upload-btn">
+        🖼️ Insert image
+      </label>
+      <input type="file" id="image_upload" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;">
+      <span id="upload_status" class="upload-status"></span>
+    </div>
     <textarea id="content" name="content" rows="16" required>{{ post.content if post else '' }}</textarea>
   </div>
   <label class="checkbox-row">
@@ -26,5 +33,48 @@
     <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
   </div>
 </form>
+
+<script>
+document.getElementById('image_upload').addEventListener('change', async function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('upload_status');
+  const textarea = document.getElementById('content');
+  statusEl.textContent = 'Uploading…';
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const response = await fetch("{{ url_for('upload_image') }}", {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      statusEl.textContent = data.error || 'Upload failed.';
+      return;
+    }
+
+    const snippet = `![${file.name}](${data.url})`;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.slice(0, start);
+    const after = textarea.value.slice(end);
+    textarea.value = before + snippet + after;
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+
+    statusEl.textContent = 'Image inserted ✓';
+    setTimeout(() => { statusEl.textContent = ''; }, 2500);
+  } catch (err) {
+    statusEl.textContent = 'Upload failed — check your connection.';
+  }
+
+  e.target.value = '';
+});
+</script>
 
 {% endblock %}
